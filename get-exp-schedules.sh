@@ -5,7 +5,7 @@
 # SET-UP
 DOY=$(date +%j)
 YR=$(date +%Y)
-DOYp7=$(date -d +"50 days" +%j)
+DOYp7=$(date -d +"7 days" +%j)
 
 #######################################
 
@@ -35,43 +35,40 @@ NS_EXP_COUNT=0
 NS_EXPS_THIS_WEEK=()
 
 #the line structure and what we wish to capture (using "()") from it:
-regex=".*\|([A-Za-z]{1,2}[0-9]{3,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s.*"	 # good but can't distinguish cancelled exps.
+regex=".*\|([A-Za-z]{1,3}[0-9]{2,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s.*"	 # ok but can't distinguish cancelled exps.
+#regex=".*\|([A-Za-z]{1,3}[0-9]{2,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s+\|.*"	# not any better
 
 # Read the input text file line by line and parse each line
 while read -r line
 do
-
-	if [[ $line =~ $regex ]]
+	if ! [[ $(echo $line | grep "\\---") ]]
 	then
-		EXP_CODE="${BASH_REMATCH[1]}"
-		EXP_DOY="${BASH_REMATCH[2]}"
-		EXP_START_TIME="${BASH_REMATCH[3]}"
-		EXP_STATIONS="${BASH_REMATCH[4]}"
-	fi
-
-	if [[ "$EXP_DOY" -gt "$DOY" ]] && [[ "$EXP_DOY" -lt "$DOYp7" ]]
-	then
-		(( MASTER_COUNT++ ))
-
-		echo "$EXP_CODE"
-		echo "$EXP_STATIONS"
-
-		if [[ $(echo "$EXP_STATIONS" | grep -) ]]
+		if [[ $line =~ $regex ]]
 		then
-			EXP_STATIONS=$(echo $"$EXP_STATIONS" | cut -d ' ' -f1)	 #this deletes the cancelled exps from the string
+			EXP_CODE="${BASH_REMATCH[1]}"
+			EXP_DOY="${BASH_REMATCH[2]}"
+			EXP_START_TIME="${BASH_REMATCH[3]}"
+			EXP_STATIONS="${BASH_REMATCH[4]}"
 		fi
-
-		if [[ $(echo "$EXP_STATIONS" | grep Nn) ]]
+		if [[ "$EXP_DOY" -gt "$DOY" ]] && [[ "$EXP_DOY" -lt "$DOYp7" ]]
 		then
-			(( NN_EXP_COUNT++ ))
-			EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME"
-			NN_EXPS_THIS_WEEK+=("$EXP_INFO")
-		fi
-		if [[ $(echo "$EXP_STATIONS" | grep Ns) ]]
-		then
-			(( NS_EXP_COUNT++ ))
-			EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME"
-			NS_EXPS_THIS_WEEK+=("$EXP_INFO")
+			(( MASTER_COUNT++ ))
+			if [[ $(echo "$EXP_STATIONS" | grep -) ]]
+			then
+				EXP_STATIONS=$(echo $"$EXP_STATIONS" | cut -d ' ' -f1)	 #this deletes the cancelled exps from the string
+			fi
+			if [[ $(echo "$EXP_STATIONS" | grep Nn) ]]
+			then
+				(( NN_EXP_COUNT++ ))
+				EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME"
+				NN_EXPS_THIS_WEEK+=("$EXP_INFO")
+			fi
+			if [[ $(echo "$EXP_STATIONS" | grep Ns) ]]
+			then
+				(( NS_EXP_COUNT++ ))
+				EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME"
+				NS_EXPS_THIS_WEEK+=("$EXP_INFO")
+			fi
 		fi
 	fi
 done < $MASTER_FILE
@@ -80,34 +77,36 @@ done < $MASTER_FILE
 
 while read -r line
 do
-	if [[ $line =~ $regex ]]
+	if ! [[ $(echo $line | grep "\\---") ]]
 	then
-		EXP_CODE="${BASH_REMATCH[1]}"
-		EXP_DOY="${BASH_REMATCH[2]}"
-		EXP_START_TIME="${BASH_REMATCH[3]}"
-		EXP_STATIONS="${BASH_REMATCH[4]}"
-	fi
-
-	if [[ "$EXP_DOY" -gt "$DOY" ]] && [[ "$EXP_DOY" -lt "$DOYp7" ]]
-	then
-		(( INTENSIVE_COUNT++ ))
-
-		if [[ $(echo "$EXP_STATIONS" | grep -) ]]
+		if [[ $line =~ $regex ]]
 		then
-			EXP_STATIONS=$(echo $"$EXP_STATIONS" | cut -d ' ' -f1)	 #this deletes the cancelled exps from the string
+			EXP_CODE="${BASH_REMATCH[1]}"
+			EXP_DOY="${BASH_REMATCH[2]}"
+			EXP_START_TIME="${BASH_REMATCH[3]}"
+			EXP_STATIONS="${BASH_REMATCH[4]}"
 		fi
+		if [[ "$EXP_DOY" -gt "$DOY" ]] && [[ "$EXP_DOY" -lt "$DOYp7" ]]
+		then
+			(( INTENSIVE_COUNT++ ))
 
-		if [[ $(echo "$EXP_STATIONS" | grep Nn) ]]
-		then
-			(( NN_EXP_COUNT++ ))
-			EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME (1-hr)"
-			NN_EXPS_THIS_WEEK+=("$EXP_INFO")
-		fi
-		if [[ $(echo "$EXP_STATIONS" | grep Ns) ]]
-		then
-			(( NS_EXP_COUNT++ ))
-			EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME (1-hr)"
-			NS_EXPS_THIS_WEEK+=("$EXP_INFO")
+			if [[ $(echo "$EXP_STATIONS" | grep -) ]]
+			then
+				EXP_STATIONS=$(echo $"$EXP_STATIONS" | cut -d ' ' -f1)	 #this deletes the cancelled exps from the string
+			fi
+
+			if [[ $(echo "$EXP_STATIONS" | grep Nn) ]]
+			then
+				(( NN_EXP_COUNT++ ))
+				EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME (1-hr)"
+				NN_EXPS_THIS_WEEK+=("$EXP_INFO")
+			fi
+			if [[ $(echo "$EXP_STATIONS" | grep Ns) ]]
+			then
+				(( NS_EXP_COUNT++ ))
+				EXP_INFO="$EXP_CODE $EXP_DOY $EXP_START_TIME (1-hr)"
+				NS_EXPS_THIS_WEEK+=("$EXP_INFO")
+			fi
 		fi
 	fi
 done < $INTENSIVES_FILE
@@ -123,12 +122,14 @@ echo "This week (days $DOY - $DOYp7) there are ${MASTER_COUNT} 24-hr and ${INTEN
 echo "------------------------------------------------------"
 echo "And..."
 echo "            NN is in ${NN_EXP_COUNT}:"
+echo
 for EXP in "${NN_EXPS_THIS_WEEK[@]}"
 do
 	echo "		$EXP"
 done
 echo
 echo "            NS is in ${NS_EXP_COUNT}:"
+echo
 for EXP in "${NS_EXPS_THIS_WEEK[@]}"
 do
 	echo "		$EXP"
