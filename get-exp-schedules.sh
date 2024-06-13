@@ -5,21 +5,25 @@
 
 get_file() {
 	# to download the master or intensive file from the cddis database
+	#
 	local FILE="$1"  # $MASTER_FILE
 	local URL="$2"	 # https://cddis.nasa.gov/archive/vlbi/ivscontrol/master$YR.txt
-
 	if ! [ -f "$FILE" ]
 	then
 		echo "(Getting $FILE schedule file...)"
-		if ! curl --location --cookie cookies.txt "$1" > "$2"
+		if ! curl --location --cookie cookies.txt "$2" > "$1"
 		then
 			echo "Failed to download $FILE from $URL"
 			exit 1
 		fi
+		echo "------------------------------------------------------"
 	fi
+
 }
 
 get_exp_info() {
+	# to get the relevant information from the line
+	#
 	local line="$1"
 	#the line structure and what we wish to capture (using "()") from it:
 	local regex=".*\|([A-Za-z]{1,3}[0-9]{2,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s.*"	 # ok but can't distinguish cancelled exps.
@@ -34,7 +38,8 @@ get_exp_info() {
 }
 
 process_file() {
-	#to parse and process the experiment roster file we just downloaded
+	# to parse and process the experiment roster file we just downloaded
+	#
 	local EXP_COUNT=0
 	local NN_EXP_COUNT=0
 	local NN_EXPS_THIS_WEEK=()
@@ -73,7 +78,6 @@ process_file() {
 		fi
 	done < $FILE
 
-
 	echo "------------------------------------------------------"
 	echo "	There are $EXP_COUNT experiments.         "
 	if [[ "$NN_EXP_COUNT" -gt 0 ]]
@@ -93,16 +97,13 @@ process_file() {
 		done
 	fi
 	echo "------------------------------------------------------"
-
-
-
 }
 
 #######################################
 # SET-UP
 DOY=$(date +%j)
 YR=$(date +%Y)
-DOYp7=$(date -d +"7 days" +%j)
+DOYp7=$(date -d +"40 days" +%j)
 ######################################
 echo "------------------------------------------------------"
 echo "------------------------------------------------------"
