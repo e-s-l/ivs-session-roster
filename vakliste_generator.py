@@ -192,11 +192,6 @@ def generate_workbook():
 
     set_border(sheet, 'A1:A7')
 
-
-
-
-
-
     ###
 
     # save the file
