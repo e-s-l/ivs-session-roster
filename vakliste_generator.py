@@ -59,9 +59,21 @@ def generate_workbook():
     print(sess_test.get_finish_doy())
 
     print(sess_test.get_lt_finish())
+    print("******************")
 
     ##
     observers = ["ab","cd","ef"]
+
+    # How to distribute the observers equally between the shifts?
+
+    ###
+
+    exp_list = get_exp_list_from_file("exps.txt")
+
+    exp_list = sorted(exp_list, key=lambda exp: exp.doy)
+
+    for exp in exp_list:
+        print(exp.name, exp.doy, exp.ut, exp.get_week_num())
 
 
     ###
@@ -70,13 +82,36 @@ def generate_workbook():
     workbook.save(filename="test.xlsx")
 
 
+    ###
+
+def get_week_from_date_string(date_string):
+
+    return datetime.strptime(date_string, "%d-%m-%Y").date().isocalendar().week
+
+def get_exp_list_from_file(filename):
+
+    exp_list = []
+    file = open(filename,'r')
+    lines = file.readlines()
+    for l in lines:
+        lc = l.split()
+        exp = Session(lc[0],lc[1],lc[2],24)
+        exp_list.append(exp)
+    file.close()
+
+    return exp_list
+
 class Session:
 
     def __init__(self, name, doy_start, ut_start, duration):
         self.name = name
-        self.doy = doy_start
+        self.doy = int(doy_start)
         self.ut = ut_start
-        self.duration = duration
+        self.duration = int(duration)
+
+    def get_week_num(self):
+
+        return get_week_from_date_string(self.get_start_date())
 
     def get_start_date(self):
 
@@ -91,10 +126,11 @@ class Session:
 
         time_zone_shift_value = 2 # hours
         tl = self.ut.split(":")
-        tl[0] = f"{int(tl[0]) + time_zone_shift_value}"
-        lt = f"{tl[0]}:{tl[1]}"
+        h = int(tl[0]) + time_zone_shift_value
+        m = int(tl[1])
+        h = h % 24
+        lt = f"{h:02}:{m:02}"
 
-        #need to mod 24....
 
         return lt
 
@@ -119,8 +155,7 @@ class Session:
         start_hour_ut = int(tl[0])
         finish_hour_ut = start_hour_ut + self.duration
         finish_hour_lt = finish_hour_ut +  time_zone_shift_value
-        if finish_hour_lt >= 24:
-            finish_hour_lt = finish_hour_lt % 24
+        finish_hour_lt = finish_hour_lt % 24
         finish_lt = f"{finish_hour_lt}:{tl[1]}"
         return finish_lt
 
