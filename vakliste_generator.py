@@ -1,6 +1,6 @@
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side
-from openpyxl.styles import Color, Fill, PatternFill, Font
+from openpyxl.styles import Color, Fill, PatternFill, Font, Alignment
 #import datetime
 from datetime import date, datetime, timedelta
 import itertools
@@ -15,6 +15,10 @@ def generate_workbook():
     sheet = workbook.active
 
     # fill out prelimaries:
+
+    sheet.column_dimensions['A'].width = 12.5
+
+    ###
 
     col = "A"
     max_rows = 20
@@ -155,8 +159,11 @@ def generate_workbook():
 
         sheet[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
         sheet[f"{alpha[i]}4"].font = Font(color = my_green)
+
         sheet[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
         sheet[f"{alpha[i]}5"].font = Font(color = my_green)
+        sheet[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center')
+
         sheet[f"{alpha[i]}6"] = f"{exp.doy}"
         sheet[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
 
@@ -178,6 +185,7 @@ def generate_workbook():
                     sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
                 elif l == 1:
                     sheet[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
+            sheet[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center')
 
            # sheet[f"{alpha[i]}{j}"] = "XXX"
         # sheet[f"{alpha[i]}{j}"].fill = PatternFill(patternType='solid', fgColor = reverse_lookup.get(exp.name).colour)
