@@ -1,4 +1,6 @@
 from openpyxl import Workbook
+from openpyxl.styles import Border, Side
+from openpyxl.styles import Color, Fill, PatternFill, Font
 #import datetime
 from datetime import date, datetime, timedelta
 import itertools
@@ -69,7 +71,16 @@ def generate_workbook():
     print("******************")
 
     ##
-    observers = ["Rubana", "Susen", "Jontoine", "Anon"]
+    observers_input = ["AB", "CD", "EF", "GH"]
+    observers = []
+
+    colour_list = ["00FF0000", "00800080", "003366FF", "00008080", "0000FFFF", "009999FF"]
+    i = 0
+    for who in observers_input:
+        color = colour_list[i]
+        i += 1
+        obs = Observer(who, color)
+        observers.append(obs)
 
     # How to distribute the observers equally between the shifts?
 
@@ -86,16 +97,17 @@ def generate_workbook():
 
     print(len(exp_list))
 
+ #   observers_name_list = [o.name for o in observers]
+
 
     schedule = distribute_shifts(observers, exp_list)
     reverse_lookup = create_reverse_lookup(schedule)
 
-    print(schedule)
 
     ###
 
     for staff, shifts in schedule.items():
-        print (staff, ": ", len(shifts))
+        print (staff.name, ": ", len(shifts))
     ###
 
 
@@ -112,39 +124,73 @@ def generate_workbook():
 
         on_duty = reverse_lookup.get(exp.name)
 
-        print(exp.name, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut, exp.get_lt_shift_start(), exp.get_week_num(), on_duty)
+        print(exp.name, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut, exp.get_lt_shift_start(), exp.get_week_num(), on_duty.name)
 
     print("***********************************************")
 
     ###
 
+
+    my_red = '00FF0000'
+    my_green = '0000FF00'
+    my_red_fill = PatternFill(patternType='solid', fgColor=Color(my_red))
+
+
+
+
    # alpha = "ABCDEFGHIJKLNOPQRSTUVWXYZ"
     alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "II", "JJ", "KK", "LL", "MM", "NN", "OO", "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX", "YY", "ZZ", "AAA"]
     i = 1
     j = 8
+    k = 1
 
     for exp in exp_list:
         sheet[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
+        sheet[f"{alpha[i]}1"].fill = my_red_fill
+
+
         sheet[f"{alpha[i]}2"] = f"{exp.name}"
+        sheet[f"{alpha[i]}2"].font = Font(color = my_red)
+
+
         sheet[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
+        sheet[f"{alpha[i]}4"].font = Font(color = my_green)
         sheet[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
+        sheet[f"{alpha[i]}5"].font = Font(color = my_green)
         sheet[f"{alpha[i]}6"] = f"{exp.doy}"
         sheet[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
 
-        #
-        sheet[f"A{j}"] = reverse_lookup.get(exp.name)
+        duration = 24
+        if duration >= 24:
+            k = 2
 
-        #
-        sheet[f"{alpha[i]}{j}"] = "XXX"
+        for l in range(k):
+            j = j + l
+            sheet[f"A{j}"] = (reverse_lookup.get(exp.name)).name
+            sheet[f"A{j}"].font = Font(color = reverse_lookup.get(exp.name).colour)
 
+            #
 
+            if k == 1:
+                sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
+            elif k == 2:
+                if l == 0:
+                    sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
+                elif l == 1:
+                    sheet[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
+
+           # sheet[f"{alpha[i]}{j}"] = "XXX"
+        # sheet[f"{alpha[i]}{j}"].fill = PatternFill(patternType='solid', fgColor = reverse_lookup.get(exp.name).colour)
+            sheet[f"{alpha[i]}{j}"].font = Font(color = reverse_lookup.get(exp.name).colour)
         #
         i += 1
         j += 1
 
 
 
+    ### STYLE STUFF:
 
+    set_border(sheet, 'A1:A7')
 
 
 
@@ -158,6 +204,16 @@ def generate_workbook():
 
 
     ###
+
+
+
+def set_border(ws, cell_range):
+    thin = Side(border_style="thin", color="000000")
+    for row in ws[cell_range]:
+        for cell in row:
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
+
 
 def create_reverse_lookup(schedule):
     reverse_lookup = {}
@@ -193,6 +249,18 @@ def get_exp_list_from_file(filename):
 
     return exp_list
 
+class Observer:
+
+    def __init__(self, name, colour):
+        self.name = name
+        self.colour = colour
+
+    def set_colour(self, colour):
+        self.colour = colour
+
+    def get_colour(self):
+        return self.colour
+
 class Session:
 
     def __init__(self, name, doy_start, ut_start, duration):
@@ -213,6 +281,19 @@ class Session:
         d = date_dmy.strftime('%d-%m-%Y')
 
         return d
+
+
+    def get_lt_finish(self):
+
+        time_zone_shift_value = 2 # hours
+
+        tl = self.ut.split(":")
+        start_hour_ut = int(tl[0])
+        finish_hour_ut = start_hour_ut + self.duration
+        finish_hour_lt = finish_hour_ut +  time_zone_shift_value
+        finish_hour_lt = finish_hour_lt % 24
+        finish_lt = f"{finish_hour_lt}:{tl[1]}"
+        return finish_lt
 
 
     def get_start_date(self):
@@ -244,6 +325,19 @@ class Session:
         return lt
 
 
+    def get_lt_shift_end(self):
+
+        exp_lt_end = self.get_lt_finish()
+        tl = exp_lt_end.split(":")
+        m_exp = int(tl[1])
+        m_shift = m_exp + 30
+        m = m_shift % 60
+        h_shift = int(tl[0])
+        h = h_shift + (m_shift // 60)
+        lt = f"{h:02}:{m:02}"
+        return lt
+
+
     def get_lt_start(self):
 
         time_zone_shift_value = 2 # hours
@@ -269,18 +363,6 @@ class Session:
             doy_finish = self.doy
 
         return doy_finish
-
-    def get_lt_finish(self):
-
-        time_zone_shift_value = 2 # hours
-
-        tl = self.ut.split(":")
-        start_hour_ut = int(tl[0])
-        finish_hour_ut = start_hour_ut + self.duration
-        finish_hour_lt = finish_hour_ut +  time_zone_shift_value
-        finish_hour_lt = finish_hour_lt % 24
-        finish_lt = f"{finish_hour_lt}:{tl[1]}"
-        return finish_lt
 
 
 
