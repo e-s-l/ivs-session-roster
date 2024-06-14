@@ -7,6 +7,6 @@
 
 FILE=$1
 
-NEW_FILE="exps.txt"
+NEW_FILE=$2
 
-grep -E '[A-Za-z]{1,3}[0-9]{2,5} [0-9]{1,3} [0-9]{2}:[0-9]{2}' "$FILE" | awk '{$1=$1};1' >> $NEW_FILE
+grep -E '[A-Za-z]{1,3}[0-9]{2,5} [0-9]{1,3} [0-9]{2}:[0-9]{2}' "$FILE" | awk '{$1=$1};1' > $NEW_FILE
