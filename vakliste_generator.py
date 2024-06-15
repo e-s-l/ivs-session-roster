@@ -1,12 +1,13 @@
 #
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, Color, Fill, PatternFill, Font, Alignment
-from datetime import date, datetime, timedelta
 import itertools
+from session import Session
+from observer import Observer
 
-'''
+"""
  Auto-create a roster spreadsheet from a list of experiments and on-duty observers.
-'''
+"""
 
 
 def generate_workbook():
@@ -163,6 +164,7 @@ def generate_workbook():
 
 
 def set_border(ws, cell_range):
+    """Give the cell a border."""
     thin = Side(border_style="thin", color="000000")
     for row in ws[cell_range]:
         for cell in row:
@@ -170,6 +172,7 @@ def set_border(ws, cell_range):
 
 
 def create_reverse_lookup(schedule):
+    """Get experiment given who is on duty."""
     reverse_lookup = {}
     for staff, shifts in schedule.items():
         for shift in shifts:
@@ -178,21 +181,17 @@ def create_reverse_lookup(schedule):
 
 
 def distribute_shifts(staff_list, shifts_list):
+    """Associate an experiment with an on-duty observer."""
     schedule = {staff: [] for staff in staff_list}
     staff_cycle = itertools.cycle(staff_list)
     for shift in shifts_list:
         current_staff = next(staff_cycle)
         schedule[current_staff].append(shift.name)
-
     return schedule
 
 
-def get_week_from_date_string(date_string):
-    return datetime.strptime(date_string, "%d-%m-%Y").date().isocalendar().week
-
-
 def get_observer_list(observers_input, colour_list):
-    # create list of observer objects:
+    """Create list of observer objects."""
     observers = []
     i = 0
     for who in observers_input:
@@ -200,11 +199,11 @@ def get_observer_list(observers_input, colour_list):
         i += 1
         obs = Observer(who, color)
         observers.append(obs)
-
     return observers
 
 
 def get_exp_list_from_file(filename):
+    """Create list of experiment objects."""
     exp_list = []
     file = open(filename, 'r')
     lines = file.readlines()
@@ -213,114 +212,13 @@ def get_exp_list_from_file(filename):
         exp = Session(lc[0], lc[1], lc[2], 24)
         exp_list.append(exp)
     file.close()
-
     return exp_list
-
-
-class Observer:
-
-    def __init__(self, name, colour):
-        self.name = name
-        self.colour = colour
-
-    def set_colour(self, colour):
-        self.colour = colour
-
-    def get_colour(self):
-        return self.colour
-
-
-class Session:
-
-    def __init__(self, name, doy_start, ut_start, duration):
-        self.name = name
-        self.doy = int(doy_start)
-        self.ut = ut_start
-        self.duration = int(duration)
-
-    def get_week_num(self):
-
-        return get_week_from_date_string(self.get_start_date_dmy())
-
-    def get_start_date_dmy(self):
-
-        day_num = self.doy
-        year = date.today().year
-        date_dmy = datetime(year, 1, 1) + timedelta(day_num - 1)
-        d = date_dmy.strftime('%d-%m-%Y')
-        return d
-
-    def get_lt_finish(self):
-
-        time_zone_shift_value = 2  # hours
-        tl = self.ut.split(":")
-        start_hour_ut = int(tl[0])
-        finish_hour_ut = start_hour_ut + self.duration
-        finish_hour_lt = finish_hour_ut + time_zone_shift_value
-        finish_hour_lt = finish_hour_lt % 24
-        finish_lt = f"{finish_hour_lt}:{tl[1]}"
-        return finish_lt
-
-    def get_start_date(self):
-
-        day_num = self.doy
-        year = date.today().year
-        date_dmy = datetime(year, 1, 1) + timedelta(day_num - 1)
-        d = date_dmy.strftime('%d-%m')
-        return d
-
-    def get_name_of_start_day(self):
-
-        day_num = self.doy
-        year = date.today().year
-        d = datetime(year, 1, 1) + timedelta(day_num - 1)
-        return d.strftime("%A")
-
-    def get_lt_shift_start(self):
-
-        time_zone_shift_value = 2  # hours
-        prep_time = 1
-        tl = self.ut.split(":")
-        h = int(tl[0]) + time_zone_shift_value - prep_time
-        m = int(tl[1])
-        h = h % 24
-        lt = f"{h:02}:{m:02}"
-        return lt
-
-    def get_lt_shift_end(self):
-
-        exp_lt_end = self.get_lt_finish()
-        tl = exp_lt_end.split(":")
-        m_exp = int(tl[1])
-        m_shift = m_exp + 30
-        m = m_shift % 60
-        h_shift = int(tl[0])
-        h = h_shift + (m_shift // 60)
-        lt = f"{h:02}:{m:02}"
-        return lt
-
-    def get_lt_start(self):
-
-        time_zone_shift_value = 2  # hours
-        tl = self.ut.split(":")
-        h = int(tl[0]) + time_zone_shift_value
-        m = int(tl[1])
-        h = h % 24
-        lt = f"{h:02}:{m:02}"
-        return lt
-
-    def get_finish_doy(self):
-
-        start_hour = int(self.ut.split(":")[0])
-        finish_hour = start_hour + self.duration
-        doy_finish = self.doy + (finish_hour // 24)
-        return doy_finish
 
 
 if __name__ == '__main__':
 
-    # create object lists:
+    # parse inputs (month?)
+    # create object lists
     # create schedule
     # create workbook (passing in object lists and schedule)
-
     generate_workbook()
