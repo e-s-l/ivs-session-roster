@@ -1,13 +1,12 @@
-#
-from openpyxl import Workbook
-from openpyxl.styles import Border, Side, Color, Fill, PatternFill, Font, Alignment
-import itertools
-from session import Session
-from observer import Observer
-
 """
  Auto-create a roster spreadsheet from a list of experiments and on-duty observers.
 """
+
+from openpyxl import Workbook
+from openpyxl.styles import Border, Side, Color, PatternFill, Font, Alignment
+import itertools
+from session import Session
+from observer import Observer
 
 
 def generate_workbook():
@@ -24,7 +23,6 @@ def generate_workbook():
     sheet.column_dimensions['A'].width = 12.5
 
     # fill in the first column (integrate this later into a complete fill-out function)
-    col = "A"
     max_rows = 20
     for r in range(max_rows):
         box = "A%s" % r
@@ -51,12 +49,13 @@ def generate_workbook():
 
     # define colour and colour list:
     # name = color # compliment
-    red = "00FF0000"        # cyan
-    purple = "00800080"     # 008000
-    blue = "003366FF"       # FFCC33
-    teal = "00008080"       # 800000
-    cyan = "0000FFFF"       # red
-    lavender = "009999FF"   # FFFF99
+    red = "00FF0000"  # cyan
+    purple = "00800080"  # 008000
+    blue = "003366FF"  # FFCC33
+    teal = "00008080"  # 800000
+    cyan = "0000FFFF"  # red
+    lavender = "009999FF"  # FFFF99
+    # need to think about what colours would actually look nice, these above are just place-holders
 
     # list of all colours we would like in the spreadsheet:
     colour_list = [red, purple, blue, teal, cyan, lavender]
@@ -96,7 +95,8 @@ def generate_workbook():
         print("EXP, D.O.Y., DATE, NAME, START (UT), START (LT), WEEK #, ON-DUTY")
         for exp in exp_list:
             on_duty = reverse_lookup.get(exp.name)
-            print(exp.name, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut, exp.get_lt_shift_start(),
+            print(exp.name, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut,
+                  exp.get_lt_shift_start(),
                   exp.get_week_num(), on_duty.name)
         print("******************")
     #
@@ -110,36 +110,37 @@ def generate_workbook():
     # configure start points
     i = 1
     j = 8
-    k = 1
     # start filling out the heard of the spreadsheet
     for exp in exp_list:
+        #
         sheet[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
         sheet[f"{alpha[i]}1"].fill = my_red_fill
-
+        #
         sheet[f"{alpha[i]}2"] = f"{exp.name}"
         sheet[f"{alpha[i]}2"].font = Font(color=red)
-
+        #
         sheet[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
         sheet[f"{alpha[i]}4"].font = Font(color=teal)
-
+        #
         sheet[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
         sheet[f"{alpha[i]}5"].font = Font(color=teal)
         sheet[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center')
-
+        #
         sheet[f"{alpha[i]}6"] = f"{exp.doy}"
         sheet[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
 
+        # place holder:
         duration = 24
-        if duration >= 24:
-            k = 2
-
+        # check if session overflows to following day
+        k = 1 + (duration // 24)
         for l in range(k):
             j = j + l
             sheet[f"A{j}"] = (reverse_lookup.get(exp.name)).name
             sheet[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
-
+            # if no overflow
             if k == 1:
                 sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
+            # if overflows
             elif k == 2:
                 if l == 0:
                     sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
@@ -148,15 +149,13 @@ def generate_workbook():
 
             sheet[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center')
             sheet[f"{alpha[i]}{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
-
         #
         i += 1
         j += 1
-    #
-
     # style the spreadsheet
     set_border(sheet, 'A1:A7')
 
+    ###
     # save the file
     workbook.save(filename="test.xlsx")
 
@@ -216,7 +215,6 @@ def get_exp_list_from_file(filename):
 
 
 if __name__ == '__main__':
-
     # parse inputs (month?)
     # create object lists
     # create schedule

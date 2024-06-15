@@ -1,6 +1,6 @@
-from datetime import date, datetime, timedelta
-
 """A lot of this is reformatting date objects and time strings..."""
+
+from datetime import date, datetime, timedelta
 
 
 class Session:
