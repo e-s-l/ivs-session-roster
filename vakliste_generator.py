@@ -19,31 +19,8 @@ def generate_workbook():
     wb = Workbook()
     ws = wb.active
 
-    # fill out preliminaries: #
-    # set width & height & that sorta stuff:
-    ws.column_dimensions['A'].width = 12.5
+    #########################################################################################
 
-    # fill in the first column (integrate this later into a complete fill-out function)
-    max_rows = 20
-    for r in range(max_rows):
-        box = "A%s" % r
-
-        if r == 1:
-            ws[box] = "WEEK"
-        if r == 2:
-            ws[box] = "SESS."
-        if r == 3:
-            ws[box] = "TELE."
-        if r == 4:
-            ws[box] = "DATE"
-        if r == 5:
-            ws[box] = "DAY"
-        if r == 6:
-            ws[box] = "D.O.Y."
-        if r == 7:
-            ws[box] = "START (LT)"
-        if r > 7:
-            ws[box] = " "
 
     # define colour and colour list:
     # name = color # compliment
@@ -57,6 +34,8 @@ def generate_workbook():
 
     # list of all colours we would like in the spreadws:
     colour_list = [red, purple, blue, teal, cyan, lavender]
+
+    #########################################################################################
 
     # mock data (probably load this in from config file in real implementation)
     observers_input = ["AB", "CD", "EF", "GH"]
@@ -94,7 +73,44 @@ def generate_workbook():
                   exp.get_week_num(), on_duty.name)
         print("------------------------------------------------------")
     #
+    #########################################################################################
+
+    # fill out preliminaries: #
+    # set width & height & that sorta stuff...
+
+    ###############################################
+    # FIRST COLUMN:
+    # fill in the first column (integrate this later into a complete fill-out function)
+    #
+    ws["A1"] = "Week"
+    ws["A1"].font = Font(bold=True)
+    ws["A1"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A2"] = "SESSION"
+    ws["A2"].font = Font(color=red, bold=True)
+    ws["A2"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A3"] = "TELESCOPE"
+    ws["A3"].font = Font(color=blue, bold=True)
+    ws["A3"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A4"] = "DATE"
+    ws["A4"].font = Font(color=teal, bold=True)
+    ws["A4"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A5"] = "DAY"
+    ws["A5"].font = Font(color=teal, bold=True)
+    ws["A5"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A6"] = "d.o.y."
+    ws["A6"].font = Font(bold=True)
+    ws["A6"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    ws["A7"] = "START (LT)"
+    ws["A7"].font = Font(color=blue, bold=True)
+    ws["A7"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+
+
+    ###############################################
+
     my_red_fill = PatternFill(patternType='solid', fgColor=Color(red))
+
+    #########################################################################################
+
     alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
              "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "II", "JJ", "KK", "LL", "MM",
              "NN", "OO", "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX", "YY", "ZZ", "AAA"]
@@ -108,23 +124,31 @@ def generate_workbook():
     for exp in exp_list:
         #
         ws[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
-        ws[f"{alpha[i]}1"].fill = my_red_fill
+        ws[f"{alpha[i]}1"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+     #   ws[f"{alpha[i]}1"].fill = my_red_fill
         #
         ws[f"{alpha[i]}2"] = f"{exp.name}"
-        ws[f"{alpha[i]}2"].font = Font(color=red)
+        ws[f"{alpha[i]}2"].font = Font(color=red, bold=True)
+        ws[f"{alpha[i]}2"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
          #
         ws[f"{alpha[i]}3"] = f"{exp.tele}"
-        ws[f"{alpha[i]}3"].font = Font(color=blue)
+        ws[f"{alpha[i]}3"].font = Font(color=blue, bold=True)
+        ws[f"{alpha[i]}3"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
         #
         ws[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
-        ws[f"{alpha[i]}4"].font = Font(color=teal)
+        ws[f"{alpha[i]}4"].font = Font(color=teal, bold=True)
+        ws[f"{alpha[i]}4"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
         #
         ws[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
-        ws[f"{alpha[i]}5"].font = Font(color=teal)
-        ws[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center')
+        ws[f"{alpha[i]}5"].font = Font(color=teal, bold=True)
+        ws[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
         #
         ws[f"{alpha[i]}6"] = f"{exp.doy}"
+        ws[f"{alpha[i]}6"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+        #
         ws[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
+        ws[f"{alpha[i]}7"].font = Font(color=blue, bold=True)
+        ws[f"{alpha[i]}7"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
 
         # place holder:
         dur_hr, dur_min = exp.get_duration()
@@ -133,7 +157,8 @@ def generate_workbook():
         for l in range(k):
             j = j + l
             ws[f"A{j}"] = (reverse_lookup.get(exp.name)).name
-            ws[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
+            ws[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour, bold=True)
+            ws[f"A{j}"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
             # if no overflow
             if k == 1:
                 ws[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
@@ -144,51 +169,70 @@ def generate_workbook():
                 elif l == 1:
                     ws[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
 
-            ws[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center')
+            ws[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center', vertical='center')
             ws[f"{alpha[i]}{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
         #
         i += 1
         j += 1
 
-    ###############################################
-    # style the spreadws
-    set_border(ws, 'A1:A7')
-    #
+    #########################################################################################
 
-    # Set column widths
-    column_widths = [20, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]
-    for i, width in enumerate(column_widths, start=1):
-        ws.column_dimensions[get_column_letter(i)].width = width
-
-    # Define styles
-    header_font = Font(bold=True)
-    center_alignment = Alignment(horizontal='center', vertical='center')
-    border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-
-    # Define fills
-    header_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+     ###
     alternating_fill = PatternFill(start_color="ADD8E6", end_color="ADD8E6", fill_type="solid")
-
-
-
-
-    # Apply styles to the headers (assuming the first row is headers)
-    for row in ws.iter_rows(min_row=1, max_row=1):
+    border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    #
+    for row in ws.iter_rows(min_row=7, max_row=ws.max_row):
         for cell in row:
-            cell.font = header_font
-            cell.alignment = center_alignment
-            cell.border = border_style
-            cell.fill = header_fill
-
-    # Apply borders to the rest of the cells
-    for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-        for cell in row:
-            cell.border = border_style
+         #   cell.border = border_style
             if row[0].row % 2 == 0:  # Apply fill to even rows
                 cell.fill = alternating_fill
 
-    ################################################
+
     ###
+    for row in ws.iter_rows(min_row=ws.max_row, max_row=ws.max_row):
+        for cell in row:
+            cell.border = Border(bottom=Side(style='thick'))
+
+
+    for col in ws["A"]:
+        col.border = Border(left=Side(style='thick'), right=Side(style='thick'))
+
+    for row in ws.iter_rows(min_row=1, max_row=1):
+        for cell in row:
+            cell.border = Border(bottom=Side(style='thick'), top=Side(style='thick'))
+
+    ws["A1"].border = Border(left=Side(style='thick'), bottom=Side(style='thick'), right=Side(style='thick'), top=Side(style='thick'))
+
+    for row in ws.iter_rows(min_row=7, max_row=7):
+        for cell in row:
+            cell.border = Border(bottom=Side(style='thick'))
+
+    ws["A7"].border = Border(left=Side(style='thick'), bottom=Side(style='thick'), right=Side(style='thick'))
+
+    ws.column_dimensions['A'].width = 20
+
+    for cc in ws.columns:
+        ws.column_dimensions[get_column_letter(cc[0].column)].width = 15
+
+
+    ###
+
+    for row in ws.iter_rows(min_row=1, max_row=7):
+        for cell in row:
+            if cell.value == "Nn":
+                cell.fill = PatternFill(patternType='lightUp', fgColor=Color(lavender))
+            if cell.value == "Ns":
+                cell.fill = PatternFill(patternType='lightUp', fgColor=Color(teal))
+
+
+
+   # for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
+   #     for cell in row:
+   #         cell.border = Border(left=Side(style='thin'), right=Side(style='thin'))
+
+    #########################################################################################
+
     # save the file
     wb.save(filename="test.xlsx")
 
