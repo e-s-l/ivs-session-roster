@@ -208,14 +208,17 @@ def generate_workbook():
 
     ###
 
+def set_cell(coord, content, colour):
 
+    sheet[coord] = content
+    sheet[coord].font = Font(color = colour)
+    sheet[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
 
 def set_border(ws, cell_range):
     thin = Side(border_style="thin", color="000000")
     for row in ws[cell_range]:
         for cell in row:
             cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-
 
 
 def create_reverse_lookup(schedule):
