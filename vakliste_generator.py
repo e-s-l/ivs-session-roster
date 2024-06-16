@@ -198,6 +198,8 @@ def generate_workbook():
     for col in ws["A"]:
         col.border = Border(left=Side(style='thick'), right=Side(style='thick'))
 
+    ws[f"A{ws.max_row}"].border = Border(left=Side(style='thick'), bottom=Side(style='thick'), right=Side(style='thick'))
+
     for row in ws.iter_rows(min_row=1, max_row=1):
         for cell in row:
             cell.border = Border(bottom=Side(style='thick'), top=Side(style='thick'))
@@ -207,6 +209,10 @@ def generate_workbook():
     for row in ws.iter_rows(min_row=7, max_row=7):
         for cell in row:
             cell.border = Border(bottom=Side(style='thick'))
+
+    for row in ws.iter_cols(ws.max_column):
+        for cell in row:
+            cell.border = Border(right=Side(style='thick'))
 
     ws["A7"].border = Border(left=Side(style='thick'), bottom=Side(style='thick'), right=Side(style='thick'))
 
