@@ -67,7 +67,7 @@ def generate_workbook():
     obs_list = get_observer_list(observers_input, colour_list)
 
     # create list of experiment objects:
-    exp_list = get_exp_list_from_file("exps.txt")
+    exp_list = get_exp_list_from_file("experiments_nn_ns.txt")
 
     # sort the list into ascending d.o.y. (not really necessary?)
     exp_list = sorted(exp_list, key=lambda x: x.doy)
@@ -92,11 +92,11 @@ def generate_workbook():
     if debug:
         print("******************")
         print("")
-        print("EXP, D.O.Y., DATE, NAME, START (UT), START (LT), WEEK #, ON-DUTY")
+        print("EXP, TELE, D.O.Y., DATE, NAME, START (UT), SHIFT (LT), DUR, WEEK #, ON-DUTY")
         for exp in exp_list:
             on_duty = reverse_lookup.get(exp.name)
-            print(exp.name, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut,
-                  exp.get_lt_shift_start(),
+            print(exp.name, exp.tele, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut,
+                  exp.get_lt_shift_start(), exp.duration,
                   exp.get_week_num(), on_duty.name)
         print("******************")
     #
@@ -118,6 +118,9 @@ def generate_workbook():
         #
         sheet[f"{alpha[i]}2"] = f"{exp.name}"
         sheet[f"{alpha[i]}2"].font = Font(color=red)
+         #
+        sheet[f"{alpha[i]}3"] = f"{exp.tele}"
+        sheet[f"{alpha[i]}3"].font = Font(color=blue)
         #
         sheet[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
         sheet[f"{alpha[i]}4"].font = Font(color=teal)
@@ -130,9 +133,9 @@ def generate_workbook():
         sheet[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
 
         # place holder:
-        duration = 24
+        dur_hr, dur_min = exp.get_duration()
         # check if session overflows to following day
-        k = 1 + (duration // 24)
+        k = 1 + (dur_hr // 24)
         for l in range(k):
             j = j + l
             sheet[f"A{j}"] = (reverse_lookup.get(exp.name)).name
@@ -159,9 +162,11 @@ def generate_workbook():
     # save the file
     workbook.save(filename="test.xlsx")
 
-    sheet[coord] = content
-    sheet[coord].font = Font(color = colour)
-    sheet[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
+#def set_cell(sheet, coord, content, color)
+
+   # sheet[coord] = content
+   # sheet[coord].font = Font(color = colour)
+   # sheet[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
 
 def set_border(ws, cell_range):
     """Give the cell a border."""
@@ -209,7 +214,8 @@ def get_exp_list_from_file(filename):
     lines = file.readlines()
     for line in lines:
         lc = line.split()
-        exp = Session(lc[0], lc[1], lc[2], 24)
+        exp = Session(lc[0], lc[1], lc[2], lc[3], lc[4])
+        #name, telescopes, doy_start, ut_start, duration):
         exp_list.append(exp)
     file.close()
     return exp_list

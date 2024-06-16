@@ -6,11 +6,12 @@ from datetime import date, datetime, timedelta
 class Session:
     """Blueprints for session objects which hold, most crucially, the experiment name, & start day & time."""
 
-    def __init__(self, name, doy_start, ut_start, duration):
+    def __init__(self, name, telescopes, doy_start, ut_start, duration):
         self.name = name
+        self.tele = telescopes
         self.doy = int(doy_start)
         self.ut = ut_start
-        self.duration = int(duration)
+        self.duration = duration
 
     def get_week_num(self):
         """Get the number of the week of the year."""
@@ -25,15 +26,20 @@ class Session:
         return d
 
     def get_lt_finish(self):
-        """Get the local time finish for the experiment."""
+        """Get the local time finish for the experiment. Need to fix this to account for minutes of duration"""
         time_zone_shift_value = 2  # hours
         tl = self.ut.split(":")
         start_hour_ut = int(tl[0])
-        finish_hour_ut = start_hour_ut + self.duration
+        dur_hr, dur_min = self.get_duration()
+        finish_hour_ut = start_hour_ut + dur_hr
         finish_hour_lt = finish_hour_ut + time_zone_shift_value
         finish_hour_lt = finish_hour_lt % 24
         finish_lt = f"{finish_hour_lt}:{tl[1]}"
         return finish_lt
+
+    def get_duration(self):
+        tl = self.duration.split(":")
+        return int(tl[0]), int(tl[1])
 
     def get_start_date(self):
         """Get the date of the start of the session in dd-mm form."""
