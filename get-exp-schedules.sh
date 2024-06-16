@@ -114,7 +114,7 @@ OUTPUT_FILE="experiments_nn_ns.txt"
 > $OUTPUT_FILE
 ######################################
 echo "------------------------------------------------------"
-echo "	Considering days $DOY - $DOY_END..."
+echo "	Considering days $DOY - $DOY_END of ${YR}..."
 echo "------------------------------------------------------"
 #######################################
 ### GET 24-HOUR SESSIONS MASTER FILE:
@@ -128,7 +128,5 @@ INTENSIVES_FILE="intensives${YR}.txt"
 get_file "$INTENSIVES_FILE" "https://cddis.nasa.gov/archive/vlbi/ivscontrol/master$YR-int.txt"
 echo "            --- INTENSIVES ---"
 process_file "$INTENSIVES_FILE" "$OUTPUT_FILE"
-######################################
-echo "------------------------------------------------------"
 ######################################
 

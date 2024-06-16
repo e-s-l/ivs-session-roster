@@ -1,8 +1,9 @@
 """
- Auto-create a roster spreadsheet from a list of experiments and on-duty observers.
+ Auto-create a roster spreadws from a list of experiments and on-duty observers.
 """
 
 from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 from openpyxl.styles import Border, Side, Color, PatternFill, Font, Alignment
 import itertools
 from session import Session
@@ -10,17 +11,17 @@ from observer import Observer
 
 
 def generate_workbook():
-    """Main function to generate the Vakliste workbook/spreadsheet for presentation."""
+    """Main function to generate the Vakliste workbook/spreadws for presentation."""
 
     debug = True
 
     # initialise: #
-    workbook = Workbook()
-    sheet = workbook.active
+    wb = Workbook()
+    ws = wb.active
 
     # fill out preliminaries: #
     # set width & height & that sorta stuff:
-    sheet.column_dimensions['A'].width = 12.5
+    ws.column_dimensions['A'].width = 12.5
 
     # fill in the first column (integrate this later into a complete fill-out function)
     max_rows = 20
@@ -28,24 +29,21 @@ def generate_workbook():
         box = "A%s" % r
 
         if r == 1:
-            sheet[box] = "WEEK"
+            ws[box] = "WEEK"
         if r == 2:
-            sheet[box] = "SESS."
+            ws[box] = "SESS."
         if r == 3:
-            sheet[box] = "TELE."
+            ws[box] = "TELE."
         if r == 4:
-            sheet[box] = "DATE"
+            ws[box] = "DATE"
         if r == 5:
-            sheet[box] = "DAY"
+            ws[box] = "DAY"
         if r == 6:
-            sheet[box] = "D.O.Y."
+            ws[box] = "D.O.Y."
         if r == 7:
-            sheet[box] = "START (LT)"
+            ws[box] = "START (LT)"
         if r > 7:
-            sheet[box] = " "
-    #
-    if debug:
-        print("******************")
+            ws[box] = " "
 
     # define colour and colour list:
     # name = color # compliment
@@ -57,7 +55,7 @@ def generate_workbook():
     lavender = "009999FF"  # FFFF99
     # need to think about what colours would actually look nice, these above are just place-holders
 
-    # list of all colours we would like in the spreadsheet:
+    # list of all colours we would like in the spreadws:
     colour_list = [red, purple, blue, teal, cyan, lavender]
 
     # mock data (probably load this in from config file in real implementation)
@@ -73,10 +71,8 @@ def generate_workbook():
     exp_list = sorted(exp_list, key=lambda x: x.doy)
 
     if debug:
-        for exp in exp_list:
-            print(exp.name, exp.doy)
-        print("******************")
-        print(len(exp_list))
+        print("------------------------------------------------------")
+        print(f"Number of Experiments this month: {len(exp_list)}")
 
     # distribute the experiments equally between the observers:
     schedule = distribute_shifts(obs_list, exp_list)
@@ -84,21 +80,19 @@ def generate_workbook():
     reverse_lookup = create_reverse_lookup(schedule)
 
     if debug:
-        print("number of shifts per person:")
+        print("Number of shifts per person on-duty:")
         for staff, shifts in schedule.items():
             print(staff.name, ": ", len(shifts))
-        print("******************")
+        print("------------------------------------------------------")
 
     if debug:
-        print("******************")
-        print("")
         print("EXP, TELE, D.O.Y., DATE, NAME, START (UT), SHIFT (LT), DUR, WEEK #, ON-DUTY")
         for exp in exp_list:
             on_duty = reverse_lookup.get(exp.name)
             print(exp.name, exp.tele, exp.doy, exp.get_start_date(), exp.get_name_of_start_day(), exp.ut,
                   exp.get_lt_shift_start(), exp.duration,
                   exp.get_week_num(), on_duty.name)
-        print("******************")
+        print("------------------------------------------------------")
     #
     my_red_fill = PatternFill(patternType='solid', fgColor=Color(red))
     alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
@@ -110,27 +104,27 @@ def generate_workbook():
     # configure start points
     i = 1
     j = 8
-    # start filling out the heard of the spreadsheet
+    # start filling out the heard of the spreadws
     for exp in exp_list:
         #
-        sheet[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
-        sheet[f"{alpha[i]}1"].fill = my_red_fill
+        ws[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
+        ws[f"{alpha[i]}1"].fill = my_red_fill
         #
-        sheet[f"{alpha[i]}2"] = f"{exp.name}"
-        sheet[f"{alpha[i]}2"].font = Font(color=red)
+        ws[f"{alpha[i]}2"] = f"{exp.name}"
+        ws[f"{alpha[i]}2"].font = Font(color=red)
          #
-        sheet[f"{alpha[i]}3"] = f"{exp.tele}"
-        sheet[f"{alpha[i]}3"].font = Font(color=blue)
+        ws[f"{alpha[i]}3"] = f"{exp.tele}"
+        ws[f"{alpha[i]}3"].font = Font(color=blue)
         #
-        sheet[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
-        sheet[f"{alpha[i]}4"].font = Font(color=teal)
+        ws[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
+        ws[f"{alpha[i]}4"].font = Font(color=teal)
         #
-        sheet[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
-        sheet[f"{alpha[i]}5"].font = Font(color=teal)
-        sheet[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center')
+        ws[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
+        ws[f"{alpha[i]}5"].font = Font(color=teal)
+        ws[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center')
         #
-        sheet[f"{alpha[i]}6"] = f"{exp.doy}"
-        sheet[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
+        ws[f"{alpha[i]}6"] = f"{exp.doy}"
+        ws[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
 
         # place holder:
         dur_hr, dur_min = exp.get_duration()
@@ -138,35 +132,71 @@ def generate_workbook():
         k = 1 + (dur_hr // 24)
         for l in range(k):
             j = j + l
-            sheet[f"A{j}"] = (reverse_lookup.get(exp.name)).name
-            sheet[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
+            ws[f"A{j}"] = (reverse_lookup.get(exp.name)).name
+            ws[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
             # if no overflow
             if k == 1:
-                sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
+                ws[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
             # if overflows
             elif k == 2:
                 if l == 0:
-                    sheet[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
+                    ws[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
                 elif l == 1:
-                    sheet[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
+                    ws[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
 
-            sheet[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center')
-            sheet[f"{alpha[i]}{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
+            ws[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center')
+            ws[f"{alpha[i]}{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
         #
         i += 1
         j += 1
-    # style the spreadsheet
-    set_border(sheet, 'A1:A7')
 
+    ###############################################
+    # style the spreadws
+    set_border(ws, 'A1:A7')
+    #
+
+    # Set column widths
+    column_widths = [20, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]
+    for i, width in enumerate(column_widths, start=1):
+        ws.column_dimensions[get_column_letter(i)].width = width
+
+    # Define styles
+    header_font = Font(bold=True)
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    # Define fills
+    header_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+    alternating_fill = PatternFill(start_color="ADD8E6", end_color="ADD8E6", fill_type="solid")
+
+
+
+
+    # Apply styles to the headers (assuming the first row is headers)
+    for row in ws.iter_rows(min_row=1, max_row=1):
+        for cell in row:
+            cell.font = header_font
+            cell.alignment = center_alignment
+            cell.border = border_style
+            cell.fill = header_fill
+
+    # Apply borders to the rest of the cells
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+        for cell in row:
+            cell.border = border_style
+            if row[0].row % 2 == 0:  # Apply fill to even rows
+                cell.fill = alternating_fill
+
+    ################################################
     ###
     # save the file
-    workbook.save(filename="test.xlsx")
+    wb.save(filename="test.xlsx")
 
-#def set_cell(sheet, coord, content, color)
+#def set_cell(ws, coord, content, color)
 
-   # sheet[coord] = content
-   # sheet[coord].font = Font(color = colour)
-   # sheet[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
+   # ws[coord] = content
+   # ws[coord].font = Font(color = colour)
+   # ws[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
 
 def set_border(ws, cell_range):
     """Give the cell a border."""
