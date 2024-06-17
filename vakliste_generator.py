@@ -73,82 +73,64 @@ def generate_workbook():
                   exp.get_week_num(), on_duty.name)
         print("------------------------------------------------------")
     #
+
     #########################################################################################
+
+    setup_worksheet(ws, exp_list, reverse_lookup, colour_list)
+
+    #########################################################################################
+
+    # save the file
+    wb.save(filename="test.xlsx")
+
+    #########################################################################################
+
+def setup_worksheet(ws, exp_list, reverse_lookup, colour_list):
 
     # fill out preliminaries: #
     # set width & height & that sorta stuff...
 
-    ###############################################
-    # FIRST COLUMN:
-    # fill in the first column (integrate this later into a complete fill-out function)
-    #
-    ws["A1"] = "Week"
-    ws["A1"].font = Font(bold=True)
-    ws["A1"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A2"] = "SESSION"
-    ws["A2"].font = Font(color=red, bold=True)
-    ws["A2"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A3"] = "TELESCOPE"
-    ws["A3"].font = Font(color=blue, bold=True)
-    ws["A3"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A4"] = "DATE"
-    ws["A4"].font = Font(color=teal, bold=True)
-    ws["A4"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A5"] = "DAY"
-    ws["A5"].font = Font(color=teal, bold=True)
-    ws["A5"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A6"] = "d.o.y."
-    ws["A6"].font = Font(bold=True)
-    ws["A6"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-    ws["A7"] = "START (LT)"
-    ws["A7"].font = Font(color=blue, bold=True)
-    ws["A7"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+    populate_worksheet(ws, exp_list, reverse_lookup, colour_list)
 
+    style_worksheet(ws, colour_list)
 
-    ###############################################
-
-    my_red_fill = PatternFill(patternType='solid', fgColor=Color(red))
 
     #########################################################################################
 
-    alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-             "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "II", "JJ", "KK", "LL", "MM",
-             "NN", "OO", "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX", "YY", "ZZ", "AAA"]
+def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
+
+    ###############################################
+    [red, purple, blue, teal, cyan, lavender] =  colour_list
+    # FIRST COLUMN:
+    # fill in the first column (integrate this later into a complete fill-out function)
+    #
+    set_header_cell(ws, 1, 1, "Week", "")
+    set_header_cell(ws, 2, 1, "SESSION", red)
+    set_header_cell(ws, 3, 1, "TELESCOPE", blue)
+    set_header_cell(ws, 4, 1, "DATE", teal)
+    set_header_cell(ws, 5, 1, "DAY", teal)
+    set_header_cell(ws, 6, 1, "d.o.y.", "")
+    set_header_cell(ws, 7, 1, "START (LT)", blue)
+
+    ###############################################
+
+  #  my_red_fill = PatternFill(patternType='solid', fgColor=Color(red))
 
     #########################################################################################
 
     # configure start points
-    i = 1
+    i = 2
     j = 8
     # start filling out the heard of the spreadws
     for exp in exp_list:
         #
-        ws[f"{alpha[i]}1"] = f"{exp.get_week_num()}"
-        ws[f"{alpha[i]}1"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-     #   ws[f"{alpha[i]}1"].fill = my_red_fill
-        #
-        ws[f"{alpha[i]}2"] = f"{exp.name}"
-        ws[f"{alpha[i]}2"].font = Font(color=red, bold=True)
-        ws[f"{alpha[i]}2"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-         #
-        ws[f"{alpha[i]}3"] = f"{exp.tele}"
-        ws[f"{alpha[i]}3"].font = Font(color=blue, bold=True)
-        ws[f"{alpha[i]}3"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-        #
-        ws[f"{alpha[i]}4"] = f"{exp.get_start_date()}"
-        ws[f"{alpha[i]}4"].font = Font(color=teal, bold=True)
-        ws[f"{alpha[i]}4"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-        #
-        ws[f"{alpha[i]}5"] = f"{exp.get_name_of_start_day()}"
-        ws[f"{alpha[i]}5"].font = Font(color=teal, bold=True)
-        ws[f"{alpha[i]}5"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-        #
-        ws[f"{alpha[i]}6"] = f"{exp.doy}"
-        ws[f"{alpha[i]}6"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
-        #
-        ws[f"{alpha[i]}7"] = f"{exp.get_lt_start()}"
-        ws[f"{alpha[i]}7"].font = Font(color=blue, bold=True)
-        ws[f"{alpha[i]}7"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+        set_header_cell(ws, 1, i, f"{exp.get_week_num()}", "")
+        set_header_cell(ws, 2, i, f"{exp.name}", red)
+        set_header_cell(ws, 3, i, f"{exp.tele}", blue)
+        set_header_cell(ws, 4, i, f"{exp.get_start_date()}", teal)
+        set_header_cell(ws, 5, i, f"{exp.get_name_of_start_day()}", teal)
+        set_header_cell(ws, 6, i, f"{exp.doy}", "")
+        set_header_cell(ws, 7, i, f"{exp.get_lt_start()}", blue)
 
         # place holder:
         dur_hr, dur_min = exp.get_duration()
@@ -156,28 +138,30 @@ def generate_workbook():
         k = 1 + (dur_hr // 24)
         for l in range(k):
             j = j + l
-            ws[f"A{j}"] = (reverse_lookup.get(exp.name)).name
-            ws[f"A{j}"].font = Font(color=reverse_lookup.get(exp.name).colour, bold=True)
-            ws[f"A{j}"].alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
+
+            set_header_cell(ws, j, 1, (reverse_lookup.get(exp.name)).name, reverse_lookup.get(exp.name).colour)
+
             # if no overflow
             if k == 1:
-                ws[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}"
+                set_header_cell(ws, j, i, f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
+
             # if overflows
             elif k == 2:
                 if l == 0:
-                    ws[f"{alpha[i]}{j}"] = f"{exp.get_lt_shift_start()}-08:00"
+                    set_header_cell(ws, j, i, f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
                 elif l == 1:
-                    ws[f"{alpha[i]}{j}"] = f"08:00-{exp.get_lt_shift_end()}"
+                    set_header_cell(ws, j, i, f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
 
-            ws[f"{alpha[i]}{j}"].alignment = Alignment(shrinkToFit=True, horizontal='center', vertical='center')
-            ws[f"{alpha[i]}{j}"].font = Font(color=reverse_lookup.get(exp.name).colour)
         #
         i += 1
         j += 1
 
     #########################################################################################
 
-     ###
+def style_worksheet(ws, colour_list):
+
+    [red, purple, blue, teal, cyan, lavender] =  colour_list
+
     alternating_fill = PatternFill(start_color="ADD8E6", end_color="ADD8E6", fill_type="solid")
     border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
     center_alignment = Alignment(horizontal='center', vertical='center')
@@ -237,16 +221,16 @@ def generate_workbook():
    #     for cell in row:
    #         cell.border = Border(left=Side(style='thin'), right=Side(style='thin'))
 
-    #########################################################################################
 
-    # save the file
-    wb.save(filename="test.xlsx")
+def set_header_cell(ws, i, j, value, color):
 
-#def set_cell(ws, coord, content, color)
+    ws.cell(row=i, column=j).value = value
+    ws.cell(row=i, column=j).alignment = Alignment(shrinkToFit=False, horizontal='center', vertical='center')
 
-   # ws[coord] = content
-   # ws[coord].font = Font(color = colour)
-   # ws[coord].alignment = Alignment(shrinkToFit=True, horizontal='center')
+    if not color:
+         ws.cell(row=i, column=j).font = Font(bold=True)
+    else:
+        ws.cell(row=i, column=j).font = Font(color=color, bold=True)
 
 def set_border(ws, cell_range):
     """Give the cell a border."""
