@@ -4,9 +4,9 @@
 
 <h2>Operations:</h2>
 
-<p>First, download the IVS roster text files as <samp>masterYEAR.txt</samp> and <samp>intensivesYEAR.text</samp> where YEAR is <i>e.g.</i> 2024 </p>
+<p>First, download the IVS roster text files as <samp>masterYEAR.txt</samp> and <samp>intensivesYEAR.text</samp> where <samp>YEAR</samp> is <i>e.g.</i> 2024 </p>
 <p>The script get-exp-schedules.sh will download these for you, but first you need to log-in and download a <samp>cookies.txt</samp> file for the site, so that curl can access it. Otherwise just end up with the html for a log-in page. So it's probably easier just to download and save with the correct names...</p>
-<p>Then run <samp>generate-roster.sh Month</samp> where Month is the <i>e.g.</i>  July (capitalised, spelled correctly... still need to implement an input parser to catch issues with this).</p>
+<p>Then run <samp>generate-roster.sh Month</samp> where <samp>Month</samp> is the <i>e.g.</i>  July (capitalised, spelled correctly... still need to implement an input parser to catch issues with this).</p>
 <p>This will run:</p>
 <ul>
   <li><samp>get-experiment-schedules.sh</samp> which will process these text files into a single text file called <samp>experiments_nn_ns.txt</samp></li>
