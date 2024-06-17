@@ -5,7 +5,7 @@
 <h2>Operations:</h2>
 
 <p>First, download the IVS roster text files as <samp>masterYEAR.txt</samp> & <samp>intensivesYEAR.text</samp> where <samp>YEAR</samp> is <i>e.g.</i> 2024 </p>
-<p>The script get-exp-schedules.sh will download these for you, but first you need to log-in & download a <samp>cookies.txt</samp> file for the site, so that curl can access it. Otherwise just end up with the html for a log-in page. So it's probably easier just to download & save with the correct names...</p>
+<p>The script <samp>get-exp-schedules.sh</samp> will download these for you, but first you need to log-in & download a <samp>cookies.txt</samp> file for the site, so that curl can access it. Otherwise just end up with the html for a log-in page. So it's probably easier just to download & save with the correct names...</p>
 <p>Then run <samp>generate-roster.sh Month</samp> where <samp>Month</samp> is the <i>e.g.</i>  July (capitalised, spelled correctly... still need to implement an input parser to catch issues with this).</p>
 <p>This will run:</p>
 <ul>
