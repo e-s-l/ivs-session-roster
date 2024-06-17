@@ -1,4 +1,6 @@
-<h1>ABOUT:</h1>
+<h1>Generate Roster</h1>
+
+<p> Given a list of experiments scheduled by the IVS, and a list of observers, produce a spreadsheet with each experiment assigned an on-duty obserser.</p>
 
 <h2>Operations:</h2>
 
