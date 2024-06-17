@@ -92,13 +92,13 @@ def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
     [red, purple, blue, teal, cyan, lavender] =  colour_list
 
     # fill in the first column
-    set_header_cell(ws, 1, 1, "Week", "")
-    set_header_cell(ws, 2, 1, "SESSION", red)
-    set_header_cell(ws, 3, 1, "TELESCOPE", blue)
-    set_header_cell(ws, 4, 1, "DATE", teal)
-    set_header_cell(ws, 5, 1, "DAY", teal)
-    set_header_cell(ws, 6, 1, "d.o.y.", "")
-    set_header_cell(ws, 7, 1, "START (LT)", blue)
+    set_cell(ws, 1, 1, "Week", "")
+    set_cell(ws, 2, 1, "SESSION", red)
+    set_cell(ws, 3, 1, "TELESCOPE", blue)
+    set_cell(ws, 4, 1, "DATE", teal)
+    set_cell(ws, 5, 1, "DAY", teal)
+    set_cell(ws, 6, 1, "d.o.y.", "")
+    set_cell(ws, 7, 1, "START (LT)", blue)
 
     ###############################################
     # configure start points
@@ -108,13 +108,13 @@ def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
     # start filling out the heard of the spreadws
     for exp in exp_list:
 
-        set_header_cell(ws, 1, i, f"{exp.get_week_num()}", "")
-        set_header_cell(ws, 2, i, f"{exp.name}", red)
-        set_header_cell(ws, 3, i, f"{exp.tele}", blue)
-        set_header_cell(ws, 4, i, f"{exp.get_start_date()}", teal)
-        set_header_cell(ws, 5, i, f"{exp.get_name_of_start_day()}", teal)
-        set_header_cell(ws, 6, i, f"{exp.doy}", "")
-        set_header_cell(ws, 7, i, f"{exp.get_lt_start()}", blue)
+        set_cell(ws, 1, i, f"{exp.get_week_num()}")
+        set_cell(ws, 2, i, f"{exp.name}", red)
+        set_cell(ws, 3, i, f"{exp.tele}", blue)
+        set_cell(ws, 4, i, f"{exp.get_start_date()}", teal)
+        set_cell(ws, 5, i, f"{exp.get_name_of_start_day()}", teal)
+        set_cell(ws, 6, i, f"{exp.doy}")
+        set_cell(ws, 7, i, f"{exp.get_lt_start()}", blue)
 
         # check if session overflows to following day
         dur_hr, dur_min = exp.get_duration()
@@ -122,18 +122,18 @@ def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
         for l in range(k):
 
             j = j + l
-            set_header_cell(ws, j, 1, (reverse_lookup.get(exp.name)).name, reverse_lookup.get(exp.name).colour)
+            set_cell(ws, j, 1, (reverse_lookup.get(exp.name)).name, reverse_lookup.get(exp.name).colour)
 
             # if no overflow
             if k == 1:
-                set_header_cell(ws, j, i, f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
+                set_cell(ws, j, i, f"{exp.get_lt_shift_start()}-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
 
             # if overflows
             elif k == 2:
                 if l == 0:
-                    set_header_cell(ws, j, i, f"{exp.get_lt_shift_start()}-08:00", color=reverse_lookup.get(exp.name).colour)
+                    set_cell(ws, j, i, f"{exp.get_lt_shift_start()}-08:00", color=reverse_lookup.get(exp.name).colour)
                 elif l == 1:
-                    set_header_cell(ws, j, i, f"08:00-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
+                    set_cell(ws, j, i, f"08:00-{exp.get_lt_shift_end()}", color=reverse_lookup.get(exp.name).colour)
 
         i += 1
         j += 1
@@ -149,7 +149,6 @@ def style_worksheet(ws, colour_list):
     alternating_fill = PatternFill(start_color="ADD8E6", end_color="ADD8E6", fill_type="solid")
     for row in ws.iter_rows(min_row=7, max_row=ws.max_row):
         for cell in row:
-         #   cell.border = border_style
             if row[0].row % 2 == 0:  # Apply fill to even rows
                 cell.fill = alternating_fill
 
@@ -187,9 +186,6 @@ def style_worksheet(ws, colour_list):
     ws["A7"].border = Border(left=Side(style='thick'), bottom=Side(style='thick'), right=Side(style='thick'))
 
     #
-    ws.column_dimensions['A'].width = 20
-
-    #
     for cc in ws.columns:
         ws.column_dimensions[get_column_letter(cc[0].column)].width = 15
 
@@ -209,7 +205,7 @@ def style_worksheet(ws, colour_list):
     ws.cell(row=7, column=ws.max_column).border = Border(bottom=Side(style='thick'), right=Side(style='thick'))
 
 
-def set_header_cell(ws, i, j, value, color):
+def set_cell(ws, i, j, value, color=""):
     """Set the cell value & style."""
 
     ws.cell(row=i, column=j).value = value
