@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Abort if invlaid arguments:
+set -e
+
 #######################################
 # FUNCTIONS:
 
@@ -18,7 +21,7 @@ get_file() {
 		fi
 		echo "------------------------------------------------------"
 	fi
-
+	return 0
 }
 
 get_exp_info() {
@@ -36,6 +39,8 @@ get_exp_info() {
 		EXP_DUR="${BASH_REMATCH[4]}"
 		EXP_STATIONS="${BASH_REMATCH[5]}"
 	fi
+
+	return 0
 }
 
 process_file() {
@@ -89,12 +94,14 @@ process_file() {
 		done
 	fi
 	echo "------------------------------------------------------"
+
+	return 0
 }
 
 #######################################
 # SET-UP
-# Abort if invlaid arguments:
-# set -e # come back to this...
+
+# come back to this...
 #
 # Input is month to generate roster for...
 MONTH=$1
