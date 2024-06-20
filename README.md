@@ -25,7 +25,9 @@ Then, second, run `generate-roster.sh Month` where `Month` is the *e.g.*  July (
 
 So, to summarise:
 
-For this to work, the user, you, need to log in to the IVS website and download a cookies file *or* download the schedule files. If the later, then name with the forms given above. These files are the input into `get-exp-schedules.sh` which processes these & produces another text file. This file, as well as another file with the observer list, is then read by  `generate-roster.sh` which finally produces the spreadsheet. (But `generate-roster.sh` is really `vakliste_generator.py`. And this also requires the class declarations `observers.py` & `session.py`.)
+For this to work, the user, you, need to log in to the IVS website and download a cookies file *or* download the schedule files. If the later, then name with the forms given above. Next you create a list ( 1 name / line) of observers to be assigned to the sessions & save this as `observers_onduty.txt`. Then, run `generate-roster.sh` followed by the month of interest.
+
+These first two files you need are the input into `get-exp-schedules.sh` which processes these & produces another text file. This text file, as well as another file with the observer list, is then read by  `vakliste_generator.py` which finally produces the spreadsheet. This script also requires the class declarations `observers.py` & `session.py`.
 
 **************************************************************
 
