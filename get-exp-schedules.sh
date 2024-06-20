@@ -93,6 +93,7 @@ process_file() {
 
 #######################################
 # SET-UP
+set -e
 # Input is month to generate roster for...
 MONTH=$1
 #MONTH="June"
