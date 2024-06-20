@@ -93,7 +93,9 @@ process_file() {
 
 #######################################
 # SET-UP
-set -e
+# Abort if invlaid arguments:
+# set -e # come back to this...
+#
 # Input is month to generate roster for...
 MONTH=$1
 #MONTH="June"
