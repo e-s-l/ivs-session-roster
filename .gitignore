@@ -1,5 +1,5 @@
 .*
-*.txt
-*v1*
-*.xlsx
 _*
+*.txt
+*.xlsx
+*-v*
