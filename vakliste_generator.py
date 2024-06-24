@@ -1,5 +1,5 @@
 """
- Auto-create a roster spreadws from a list of experiments and on-duty observers.
+ Auto-create a roster spreadsheet from a list of experiments and on-duty observers.
 """
 
 from openpyxl import Workbook
@@ -11,7 +11,7 @@ from observer import Observer
 
 
 def generate_workbook():
-    """Main function to generate the Vakliste workbook/spreadws for presentation."""
+    """Main function to generate the Vakliste workbook/spreadsheet for presentation."""
 
     debug = True
 
@@ -30,10 +30,9 @@ def generate_workbook():
     lavender = "009999FF"  # FFFF99
     # need to think about what colours would actually look nice, these above are just place-holders
 
-    # list of all colours we would like in the spreadws:
+    # list of all colours we would like in the spreadsheet:
     colour_list = [red, purple, blue, teal, cyan, lavender]
     #########################################################################################
-
 
     # create list of observer objects:
     obs_list = get_observer_list_from_file("observers_onduty.txt", colour_list)
@@ -84,12 +83,13 @@ def setup_worksheet(ws, exp_list, reverse_lookup, colour_list):
 
     # add some colours and borders
     style_worksheet(ws, colour_list)
+    #########################################################################################
 
 
 def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
     """Fill in the values of the cells."""
 
-    [red, purple, blue, teal, cyan, lavender] =  colour_list
+    [red, purple, blue, teal, cyan, lavender] = colour_list
 
     # fill in the first column
     set_cell(ws, 1, 1, "Week", "")
@@ -105,7 +105,7 @@ def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
     i = 2
     j = 8
 
-    # start filling out the heard of the spreadws
+    # start filling out the heard of the spreadsheet
     for exp in exp_list:
 
         set_cell(ws, 1, i, f"{exp.get_week_num()}")
@@ -137,13 +137,13 @@ def populate_worksheet(ws, exp_list, reverse_lookup, colour_list):
 
         i += 1
         j += 1
-
+        #########################################################################################
 
 
 def style_worksheet(ws, colour_list):
     """Fill in the border & colours."""
 
-    [red, purple, blue, teal, cyan, lavender] =  colour_list
+    [red, purple, blue, teal, cyan, lavender] = colour_list
 
     #
     alternating_fill = PatternFill(start_color="ADD8E6", end_color="ADD8E6", fill_type="solid")
@@ -203,6 +203,7 @@ def style_worksheet(ws, colour_list):
     ws.cell(row=ws.max_row, column=ws.max_column).border = Border(bottom=Side(style='thick'), right=Side(style='thick'))
     ws.cell(row=1, column=ws.max_column).border = Border(bottom=Side(style='thick'), right=Side(style='thick'), top=Side(style='thick'))
     ws.cell(row=7, column=ws.max_column).border = Border(bottom=Side(style='thick'), right=Side(style='thick'))
+    #########################################################################################
 
 
 def set_cell(ws, i, j, value, color=""):
@@ -215,6 +216,7 @@ def set_cell(ws, i, j, value, color=""):
          ws.cell(row=i, column=j).font = Font(bold=True)
     else:
         ws.cell(row=i, column=j).font = Font(color=color, bold=True)
+    #########################################################################################
 
 
 def create_reverse_lookup(schedule):
@@ -225,6 +227,7 @@ def create_reverse_lookup(schedule):
         for shift in shifts:
             reverse_lookup[shift] = staff
     return reverse_lookup
+    #########################################################################################
 
 
 def distribute_shifts(staff_list, exp_list):
@@ -247,6 +250,7 @@ def distribute_shifts(staff_list, exp_list):
 
         schedule[current_staff].append(exp.name)
     return schedule
+    #########################################################################################
 
 
 def get_observer_list_from_file(filename, colour_list):
@@ -263,6 +267,7 @@ def get_observer_list_from_file(filename, colour_list):
         obs = Observer(who, color)
         observers.append(obs)
     return observers
+    #########################################################################################
 
 
 def get_exp_list_from_file(filename):
@@ -274,12 +279,14 @@ def get_exp_list_from_file(filename):
     for line in lines:
         lc = line.split()
         exp = Session(lc[0], lc[1], lc[2], lc[3], lc[4])
-        #name, telescopes, doy_start, ut_start, duration):
+        # name, telescopes, doy_start, ut_start, duration
         exp_list.append(exp)
     file.close()
     return exp_list
+    #########################################################################################
 
 
 if __name__ == '__main__':
 
     generate_workbook()
+    #########################################################################################
