@@ -33,7 +33,8 @@ get_exp_info() {
 
 	local line="$1"
 	#the line structure and what we wish to capture (using "()") from it:
-	local regex=".*\|([A-Za-z]{1,3}[0-9]{2,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|(\s{0,2}[0-9]{0,2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s.*"	 # ok but can't distinguish cancelled exps. hack fix below...
+	local regex=".*\|([A-Za-z]{1,3}[0-9]{2,5}).*\|(\s{0,2}[0-9]{1,3})\|([0-9]{2}:[0-9]{2}).*\|(\s{0,2}[0-9]{0,2}:[0-9]{2}).*\|([A-Za-z]+.*[A-Za-z])\s.*"
+	# ok but can't distinguish cancelled exps. hack fix below...
 
 	if [[ $line =~ $regex ]]; then
 		EXP_CODE="${BASH_REMATCH[1]}"
@@ -128,7 +129,7 @@ OUTPUT_FILE="experiments_nn_ns.txt"
 
 ######################################
 echo "------------------------------------------------------"
-echo "	Considering days $DOY - $DOY_END of ${YR}..."
+echo "	Considering days ${DOY} - ${DOY_END} of ${YR}..."
 echo "------------------------------------------------------"
 
 #######################################
